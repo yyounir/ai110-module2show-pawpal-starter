@@ -54,6 +54,9 @@ Paste a sample of your app's CLI or Streamlit output here so a reader can see wh
 #   ...
 ```
 
+### Implementation Summary
+> With the help GitHub Copilot, I was able to build the backbone of the app with classes that mangages the scheduler, the user, the pet, as well as the amount of tasks. This helped me understand the structure of system design and mermaid diagrams as a whole and I would frequently ask AI about how each of the classes are implemented.
+
 ## 🧪 Testing PawPal+
 
 ```bash
@@ -65,9 +68,12 @@ pytest --cov
 ```
 
 Sample test output:
-
 ```
-# Paste your pytest output here
+Today's Schedule (2026-10-18) for Youn:
+  Snowball: Breakfast (10 min, daily, priority: high)
+  Snowball: Morning walk (30 min, daily, priority: high)
+  Ice: Fresh water and feeding (15 min, daily, priority: medium)
+  Ice: Brushing (20 min, weekly, priority: low)
 ```
 
 ## 📐 Smarter Scheduling

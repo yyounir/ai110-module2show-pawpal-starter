@@ -50,10 +50,13 @@
 - How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
 - What kinds of prompts or questions were most helpful?
 
+> So far I was able to gain a solid understanding of the system design of this app, from classes, attributes, to methods, and the general understanding of how this app works as a whole. With the help of GitHub Copilot, it generated the tests and was able to validate the code correctly. In the end, I asked follow up questions such as "What does this graph do as a whole" as well as questions like how each of the methods functions.
+
 **b. Judgment and verification**
 
 - Describe one moment where you did not accept an AI suggestion as-is.
 - How did you evaluate or verify what the AI suggested?
+>  Something I liked about what the AI has done was to check edge cases when setting up the constructor for the classes which is something I didnt expect it to do. I ran **main.py** several times to make sure that the entire structure was functioning properly, and the AI was able to successfully all tests.
 
 ---
 

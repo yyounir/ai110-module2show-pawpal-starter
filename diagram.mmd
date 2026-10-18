@@ -3,6 +3,7 @@ classDiagram
         +String name
         +setOwnerInformation(name: String): void
         +addPet(pet: Pet): void
+        +getAllTasks(): list~Task~
     }
 
     class Pet {
@@ -10,15 +11,21 @@ classDiagram
         +String species
         +String breed
         +setPatientInformation(name: String, species: String, breed: String): void
-        +addTask(task: CareTask): void
-        +editTask(taskId: UUID, updatedTask: CareTask): void
+        +addTask(task: Task): void
+        +editTask(taskId: UUID, updatedTask: Task): void
+    }
+
+    class Task {
+        +UUID taskId
+        +String description
+        +int time
+        +String frequency
+        +bool completed
+        +String priority
     }
 
     class CareTask {
-        +UUID taskId
-        +String title
-        +int durationMinutes
-        +String priority
+        <<compatibility>>
     }
 
     class ScheduleConstraints {
@@ -29,12 +36,21 @@ classDiagram
     class DailyCareSchedule {
         +Date date
         +ScheduleConstraints constraints
+        +list~Task~ tasks
         +generateFor(pet: Pet, date: Date, constraints: ScheduleConstraints): DailyCareSchedule
-        +viewDailyCareSchedule(): void
+        +viewDailyCareSchedule(): String
+    }
+
+    class Scheduler {
+        +Owner owner
+        +getAllTasks(): list~Task~
+        +generateSchedule(date: Date, constraints: ScheduleConstraints): DailyCareSchedule
     }
 
     Owner "1" --> "0..*" Pet : has
-    Pet "1" --> "0..*" CareTask : has
+    Owner --> Scheduler : provides tasks to
+    Pet "1" --> "0..*" Task : has
     Pet "1" --> "0..*" DailyCareSchedule : has
-    DailyCareSchedule "1" --> "0..*" CareTask : includes
+    DailyCareSchedule "1" --> "0..*" Task : includes
     DailyCareSchedule --> ScheduleConstraints : uses
+    CareTask --|> Task : legacy constructor
