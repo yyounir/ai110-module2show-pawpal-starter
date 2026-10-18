@@ -78,7 +78,6 @@ Today's Schedule (2026-10-18) for Youn:
 
 ## 📐 Smarter Scheduling
 
-> Fill in once you've implemented scheduling logic.
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
