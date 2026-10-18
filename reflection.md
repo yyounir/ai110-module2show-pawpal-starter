@@ -44,7 +44,7 @@
 - Why is that tradeoff reasonable for this scenario?
 
 > A tradeoff that the scheduler makes is that it uses a greedy selection, it takes tasks in the order as they see fit, rather than finding the combination that uses available time or maximizes the total value. That way, the scheduling is made simple and respects priority by they may leave time unused.
-> 
+
 
 ---
 
@@ -72,10 +72,13 @@
 - What behaviors did you test?
 - Why were these tests important?
 
+> I tested to see if adding a pet would function correctly and it did, including different pet names and breeds that were provided for the user to answer. I have also tested out saving the owners name and scheduling worked properly which also allowed me to take a look at the sorting that was provided.
+
 **b. Confidence**
 
 - How confident are you that your scheduler works correctly?
 - What edge cases would you test next if you had more time?
+> I was able to add as many data as possible especially where it was easier to manage for filtering, sorting, and conflict handling.
 
 ---
 

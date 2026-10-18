@@ -21,18 +21,25 @@ def test_adding_task_increases_pet_task_count() -> None:
     assert len(pet.tasks) == initial_task_count + 1
 
 
-def test_sort_tasks_by_formatted_duration() -> None:
+def test_sort_tasks_chronologically_by_start_time() -> None:
     pet = Pet("Milo", "cat", "tabby")
-    long_task = Task("Long task", 125)
-    short_task = Task("Short task", 5)
-    middle_task = Task("Middle task", 65)
-    pet.add_task(long_task)
-    pet.add_task(short_task)
+    late_task = Task("Late task", 5, start_time=time(11, 30))
+    early_task = Task("Early task", 125, start_time=time(8, 0))
+    middle_task = Task("Middle task", 65, start_time=time(9, 15))
+    unscheduled_task = Task("Unscheduled task", 30)
+    pet.add_task(late_task)
+    pet.add_task(early_task)
     pet.add_task(middle_task)
+    pet.add_task(unscheduled_task)
 
     sorted_tasks = Scheduler(Owner("Jordan", [pet])).sort_tasks_by_time()
 
-    assert sorted_tasks == [short_task, middle_task, long_task]
+    assert sorted_tasks == [
+        early_task,
+        middle_task,
+        late_task,
+        unscheduled_task,
+    ]
 
 
 def test_filter_tasks_by_completion_status_and_pet_name() -> None:
@@ -114,6 +121,7 @@ def test_detect_schedule_conflict_between_different_pets() -> None:
     assert "Milo's Feed Milo" in warnings[0]
     assert "Luna's Walk Luna" in warnings[0]
     assert "08:00" in warnings[0]
+    assert "both scheduled at" in warnings[0]
 
 
 def test_detect_schedule_conflict_for_tasks_of_same_pet() -> None:
@@ -125,7 +133,12 @@ def test_detect_schedule_conflict_for_tasks_of_same_pet() -> None:
         date.today(), ScheduleConstraints(available_minutes=30)
     )
 
-    assert len(scheduler.detect_schedule_conflicts(schedule)) == 1
+    warnings = scheduler.detect_schedule_conflicts(schedule)
+
+    assert len(warnings) == 1
+    assert "Breakfast" in warnings[0]
+    assert "Medication" in warnings[0]
+    assert "08:00" in warnings[0]
 
 
 def test_detect_schedule_conflicts_returns_empty_without_overlaps() -> None:

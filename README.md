@@ -43,8 +43,14 @@ pip install -r requirements.txt
 7. Refine UML so it matches what you actually built.
 
 ## 🖥️ Sample Output
-
-Paste a sample of your app's CLI or Streamlit output here so a reader can see what a generated plan looks like:
+Sample test output:
+```
+Today's Schedule (2026-10-18) for Youn:
+  Snowball: Breakfast (10 min, daily, priority: high)
+  Snowball: Morning walk (30 min, daily, priority: high)
+  Ice: Fresh water and feeding (15 min, daily, priority: medium)
+  Ice: Brushing (20 min, weekly, priority: low)
+```
 
 ```
 # e.g.:
@@ -66,15 +72,23 @@ pytest
 # Run with coverage:
 pytest --cov
 ```
+```
+(.venv) PS C:\Users\yyins\Projects\AI110\ai110-module2show-pawpal-starter> python -m pytest
+====================================================================================================== test session starts ======================================================================================================
+platform win32 -- Python 3.13.14, pytest-9.1.1, pluggy-1.7.0
+rootdir: C:\Users\yyins\Projects\AI110\ai110-module2show-pawpal-starter
+plugins: anyio-4.15.1
+collected 9 items                                                                                                                                                                                                                
 
-Sample test output:
+tests\test_pawpal.py .........                                                                                                                                                                                             [100%]
+
+======================================================================================================= 9 passed in 0.07s =======================================================================================================
+
 ```
-Today's Schedule (2026-10-18) for Youn:
-  Snowball: Breakfast (10 min, daily, priority: high)
-  Snowball: Morning walk (30 min, daily, priority: high)
-  Ice: Fresh water and feeding (15 min, daily, priority: medium)
-  Ice: Brushing (20 min, weekly, priority: low)
-```
+
+> Confidence lvl: 5
+
+
 
 ## 📐 Smarter Scheduling
 

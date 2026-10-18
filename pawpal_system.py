@@ -262,11 +262,14 @@ class Scheduler:
         return warnings
 
     def sort_tasks_by_time(self, tasks: list[Task] | None = None) -> list[Task]:
-        """Return tasks sorted by duration formatted as zero-padded HH:MM."""
+        """Return tasks sorted by start time, with unscheduled tasks last."""
         tasks_to_sort = self.get_all_tasks() if tasks is None else tasks
         return sorted(
             tasks_to_sort,
-            key=lambda task: f"{task.time // 60:02d}:{task.time % 60:02d}",
+            key=lambda task: (
+                task.start_time is None,
+                task.start_time if task.start_time is not None else Time.max,
+            ),
         )
 
     def filter_tasks(
