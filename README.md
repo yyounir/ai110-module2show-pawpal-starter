@@ -82,9 +82,10 @@ Today's Schedule (2026-10-18) for Youn:
 
 | Feature | Method(s) | Notes |
 |---------|-----------|-------|
-| Task sorting | | e.g., by priority, duration |
-| Filtering | | e.g., skip tasks if time runs out |
-| Conflict handling | | e.g., overlapping time slots |
+| Task sorting | `Scheduler.sort_tasks_by_time()` | Sorts task durations using zero-padded `HH:MM` keys. |
+| Filtering | `Scheduler.filter_tasks()` | Filters by completion status, pet name, or both. |
+| Recurring tasks | `Scheduler.mark_task_complete()` | Completing daily or weekly tasks adds a fresh occurrence due one or seven days later. |
+| Conflict handling | `Scheduler.detect_schedule_conflicts()` | Returns warnings when scheduled tasks share a start time; scheduling continues. |
 | Recurring tasks | | e.g., daily vs. weekly |
 
 ## 📸 Demo Walkthrough

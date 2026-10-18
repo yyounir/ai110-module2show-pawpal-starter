@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date as Date
+from datetime import date as Date, time as Time, timedelta
 from uuid import UUID, uuid4
 
 
@@ -13,6 +13,8 @@ class Task:
     completed: bool = False
     priority: str = "medium"
     task_id: UUID = field(default_factory=uuid4)
+    due_date: Date = field(default_factory=Date.today)
+    start_time: Time | None = None
 
     def __post_init__(self) -> None:
         """Validate task fields and normalize its priority."""
@@ -59,6 +61,8 @@ class CareTask(Task):
         frequency: str = "daily",
         completed: bool = False,
         description: str | None = None,
+        due_date: Date | None = None,
+        start_time: Time | None = None,
     ) -> None:
         """Initialize a care task using the legacy title and duration fields."""
         super().__init__(
@@ -68,6 +72,8 @@ class CareTask(Task):
             completed=completed,
             priority=priority,
             task_id=task_id or uuid4(),
+            due_date=due_date or Date.today(),
+            start_time=start_time,
         )
 
 
@@ -93,7 +99,7 @@ class DailyCareSchedule:
         pet: Pet, schedule_date: Date, constraints: ScheduleConstraints
     ) -> DailyCareSchedule:
         """Generate and attach a schedule for one pet."""
-        tasks = Scheduler.select_tasks(pet.tasks, constraints)
+        tasks = Scheduler.select_tasks(pet.tasks, constraints, schedule_date)
         schedule = DailyCareSchedule(
             date=schedule_date, constraints=constraints, tasks=tasks
         )
@@ -155,6 +161,8 @@ class Pet:
                     completed=updated_task.completed,
                     priority=updated_task.priority,
                     task_id=task_id,
+                    due_date=updated_task.due_date,
+                    start_time=updated_task.start_time,
                 )
                 return
         raise KeyError(f"No task found with id {task_id}.")
@@ -194,13 +202,110 @@ class Scheduler:
         """Retrieve the owner's tasks across all pets."""
         return self.owner.get_all_tasks()
 
+    def mark_task_complete(
+        self, task_id: UUID, completed_on: Date | None = None
+    ) -> Task | None:
+        """Complete a task and schedule its next daily or weekly occurrence."""
+        for pet in self.owner.pets:
+            for task in pet.tasks:
+                if task.task_id == task_id:
+                    if task.completed:
+                        return None
+                    task.mark_complete()
+
+                    frequency = task.frequency.casefold()
+                    interval_days = {"daily": 1, "weekly": 7}.get(frequency)
+                    if interval_days is None:
+                        return None
+
+                    next_task = Task(
+                        description=task.description,
+                        time=task.time,
+                        frequency=task.frequency,
+                        priority=task.priority,
+                        due_date=(completed_on or Date.today())
+                        + timedelta(days=interval_days),
+                        start_time=task.start_time,
+                    )
+                    pet.add_task(next_task)
+                    return next_task
+        raise KeyError(f"No task found with id {task_id}.")
+
+    def detect_schedule_conflicts(
+        self, schedule: DailyCareSchedule
+    ) -> list[str]:
+        """Return warnings for tasks assigned to the same start time."""
+        pet_by_task_id = {
+            task.task_id: pet.name for pet in self.owner.pets for task in pet.tasks
+        }
+        tasks_by_start_time: dict[Time, list[Task]] = {}
+        for task in schedule.tasks:
+            if task.start_time is not None:
+                tasks_by_start_time.setdefault(task.start_time, []).append(task)
+
+        warnings: list[str] = []
+        for start_time, tasks in tasks_by_start_time.items():
+            if len(tasks) < 2:
+                continue
+            time_label = start_time.strftime("%H:%M")
+            for index, task in enumerate(tasks):
+                for other_task in tasks[index + 1 :]:
+                    pet_name = pet_by_task_id.get(task.task_id, "Unknown pet")
+                    other_pet_name = pet_by_task_id.get(
+                        other_task.task_id, "Unknown pet"
+                    )
+                    warnings.append(
+                        f"Warning: {pet_name}'s {task.description} and "
+                        f"{other_pet_name}'s {other_task.description} are both "
+                        f"scheduled at {time_label}."
+                    )
+        return warnings
+
+    def sort_tasks_by_time(self, tasks: list[Task] | None = None) -> list[Task]:
+        """Return tasks sorted by duration formatted as zero-padded HH:MM."""
+        tasks_to_sort = self.get_all_tasks() if tasks is None else tasks
+        return sorted(
+            tasks_to_sort,
+            key=lambda task: f"{task.time // 60:02d}:{task.time % 60:02d}",
+        )
+
+    def filter_tasks(
+        self,
+        completed: bool | None = None,
+        pet_name: str | None = None,
+    ) -> list[Task]:
+        """Filter the owner's tasks by completion status and/or pet name."""
+        matching_tasks: list[Task] = []
+        normalized_pet_name = pet_name.casefold() if pet_name is not None else None
+
+        for pet in self.owner.pets:
+            if (
+                normalized_pet_name is not None
+                and pet.name.casefold() != normalized_pet_name
+            ):
+                continue
+            matching_tasks.extend(
+                task
+                for task in pet.tasks
+                if completed is None or task.completed is completed
+            )
+        return matching_tasks
+
     @classmethod
     def select_tasks(
-        cls, tasks: list[Task], constraints: ScheduleConstraints
+        cls,
+        tasks: list[Task],
+        constraints: ScheduleConstraints,
+        schedule_date: Date | None = None,
     ) -> list[Task]:
         """Select incomplete tasks that fit available time and preferences."""
         preferences = {preference.casefold() for preference in constraints.preferences}
-        candidates = [task for task in tasks if not task.completed]
+        candidates = [
+            task
+            for task in tasks
+            if not task.completed
+            and (schedule_date is None or task.due_date <= schedule_date)
+        ]
         candidates.sort(
             key=lambda task: (
                 cls._PRIORITY_ORDER[task.priority],
@@ -224,7 +329,9 @@ class Scheduler:
         self, schedule_date: Date, constraints: ScheduleConstraints
     ) -> DailyCareSchedule:
         """Create a schedule from the owner's tasks and given constraints."""
-        tasks = self.select_tasks(self.get_all_tasks(), constraints)
+        tasks = self.select_tasks(
+            self.get_all_tasks(), constraints, schedule_date
+        )
         return DailyCareSchedule(
             date=schedule_date,
             constraints=constraints,

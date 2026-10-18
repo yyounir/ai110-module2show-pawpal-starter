@@ -36,10 +36,15 @@
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
 - How did you decide which constraints mattered most?
 
+> The scheduler considers the eligibility, where it skips completed tasks and tasks whose due date is after the schedule date. The available time where it adds the task only where the duration fits the remaining minutes. Another case would be preference, where within the same priority, matching task names comes first. After priority and preferences, the shorter tasks are favored.
+
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
+
+> A tradeoff that the scheduler makes is that it uses a greedy selection, it takes tasks in the order as they see fit, rather than finding the combination that uses available time or maximizes the total value. That way, the scheduling is made simple and respects priority by they may leave time unused.
+> 
 
 ---
 

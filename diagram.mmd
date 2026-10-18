@@ -22,6 +22,8 @@ classDiagram
         +String frequency
         +bool completed
         +String priority
+        +Date dueDate
+        +Time startTime
     }
 
     class CareTask {
@@ -44,6 +46,10 @@ classDiagram
     class Scheduler {
         +Owner owner
         +getAllTasks(): list~Task~
+        +markTaskComplete(taskId: UUID): Task
+        +detectScheduleConflicts(schedule: DailyCareSchedule): list~String~
+        +sortTasksByTime(tasks: list~Task~): list~Task~
+        +filterTasks(completed: bool, petName: String): list~Task~
         +generateSchedule(date: Date, constraints: ScheduleConstraints): DailyCareSchedule
     }
 
