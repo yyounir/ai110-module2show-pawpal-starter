@@ -5,7 +5,17 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
-- What classes did you include, and what responsibilities did you assign to each?
+- What classes did you include, and what responsibilities did you assign to each?I
+
+> It would include the user entering the name of their owner and pet details. Functionality to add or edit pet-case tasks, and generate and review the daily care schedule
+
+> Information that needs to be held would be:
+> - Customer name
+> - Pet name
+> - Pet species
+> - View daily care schedule
+> - Set patient information
+> - Set owner information
 
 **b. Design changes**
 

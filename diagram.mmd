@@ -1,0 +1,32 @@
+classDiagram
+    class Owner {
+        +String name
+        +setOwnerInformation(name: String): void
+        +addPet(pet: Pet): void
+    }
+
+    class Pet {
+        +String name
+        +String species
+        +String breed
+        +setPatientInformation(name: String, species: String, breed: String): void
+        +addTask(task: CareTask): void
+        +editTask(task: CareTask): void
+    }
+
+    class CareTask {
+        +String title
+        +int durationMinutes
+        +String priority
+    }
+
+    class DailyCareSchedule {
+        +Date date
+        +generateFor(pet: Pet, date: Date): DailyCareSchedule
+        +viewDailyCareSchedule(): void
+    }
+
+    Owner "1" --> "0..*" Pet : has
+    Pet "1" --> "0..*" CareTask : has
+    Pet "1" --> "0..*" DailyCareSchedule : has
+    DailyCareSchedule "1" --> "0..*" CareTask : includes
