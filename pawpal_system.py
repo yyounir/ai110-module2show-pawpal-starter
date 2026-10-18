@@ -2,22 +2,33 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date as Date
+from uuid import UUID, uuid4
 
 
-@dataclass
+@dataclass(frozen=True)
 class CareTask:
     title: str
     duration_minutes: int
     priority: str
+    task_id: UUID = field(default_factory=uuid4)
+
+
+@dataclass(frozen=True)
+class ScheduleConstraints:
+    available_minutes: int
+    preferences: tuple[str, ...] = ()
 
 
 @dataclass
 class DailyCareSchedule:
     date: Date
+    constraints: ScheduleConstraints
     tasks: list[CareTask] = field(default_factory=list)
 
     @staticmethod
-    def generate_for(pet: Pet, schedule_date: Date) -> DailyCareSchedule:
+    def generate_for(
+        pet: Pet, schedule_date: Date, constraints: ScheduleConstraints
+    ) -> DailyCareSchedule:
         pass
 
     def view_daily_care_schedule(self) -> None:
@@ -40,7 +51,7 @@ class Pet:
     def add_task(self, task: CareTask) -> None:
         pass
 
-    def edit_task(self, task: CareTask) -> None:
+    def edit_task(self, task_id: UUID, updated_task: CareTask) -> None:
         pass
 
 

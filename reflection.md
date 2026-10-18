@@ -22,6 +22,11 @@
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
 
+> Changes I've made to the project based on AI feedback:
+> - Added a stable UUID to each care tasks so that the tasks are immutable. Editing will now target task_id an supply a replacement task, so that the task selection is explicit and an existing schedule won't change when a pet's task is replaced
+> - Added scheduleContraints with minutes and optional preferences. The generate_for has been adjusted to require those constraints, and each schedule would record them for later preference
+> - Updated UML to include the task ID, constraints class, and revised method singatures
+
 ---
 
 ## 2. Scheduling Logic and Tradeoffs

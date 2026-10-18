@@ -11,18 +11,25 @@ classDiagram
         +String breed
         +setPatientInformation(name: String, species: String, breed: String): void
         +addTask(task: CareTask): void
-        +editTask(task: CareTask): void
+        +editTask(taskId: UUID, updatedTask: CareTask): void
     }
 
     class CareTask {
+        +UUID taskId
         +String title
         +int durationMinutes
         +String priority
     }
 
+    class ScheduleConstraints {
+        +int availableMinutes
+        +tuple preferences
+    }
+
     class DailyCareSchedule {
         +Date date
-        +generateFor(pet: Pet, date: Date): DailyCareSchedule
+        +ScheduleConstraints constraints
+        +generateFor(pet: Pet, date: Date, constraints: ScheduleConstraints): DailyCareSchedule
         +viewDailyCareSchedule(): void
     }
 
@@ -30,3 +37,4 @@ classDiagram
     Pet "1" --> "0..*" CareTask : has
     Pet "1" --> "0..*" DailyCareSchedule : has
     DailyCareSchedule "1" --> "0..*" CareTask : includes
+    DailyCareSchedule --> ScheduleConstraints : uses
