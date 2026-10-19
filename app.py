@@ -10,6 +10,7 @@ if "owner" not in st.session_state:
     st.session_state["owner"] = Owner("Jordan")
 
 owner = st.session_state["owner"]
+scheduler = Scheduler(owner)
 
 st.title("🐾 PawPal+")
 
@@ -110,18 +111,44 @@ if owner.pets:
             st.error("Task title cannot be empty.")
 
     if selected_pet.tasks:
-        st.write(f"Tasks for {selected_pet.name}:")
-        st.table(
-            [
-                {
-                    "title": task.title,
-                    "duration_minutes": task.duration_minutes,
-                    "frequency": task.frequency,
-                    "priority": task.priority,
-                }
-                for task in selected_pet.tasks
-            ]
+        st.write(f"Tasks for {selected_pet.name}")
+        task_status = st.selectbox(
+            "Show tasks",
+            ["All", "Incomplete", "Completed"],
+            key="task_status_filter",
         )
+        completed_filter = {
+            "All": None,
+            "Incomplete": False,
+            "Completed": True,
+        }[task_status]
+        pet_tasks = scheduler.sort_tasks_by_time(
+            scheduler.filter_tasks(
+                completed=completed_filter,
+                pet_name=selected_pet.name,
+            )
+        )
+        st.caption(f"{len(pet_tasks)} {task_status.lower()} task(s)")
+        if pet_tasks:
+            st.table(
+                [
+                    {
+                        "task": task.title,
+                        "duration": f"{task.duration_minutes} min",
+                        "frequency": task.frequency.title(),
+                        "priority": task.priority.title(),
+                        "status": "Complete" if task.completed else "To do",
+                        "start time": (
+                            task.start_time.strftime("%H:%M")
+                            if task.start_time is not None
+                            else "Not set"
+                        ),
+                    }
+                    for task in pet_tasks
+                ]
+            )
+        else:
+            st.info(f"No {task_status.lower()} tasks for {selected_pet.name}.")
     else:
         st.info(f"No tasks for {selected_pet.name} yet.")
 else:
@@ -150,8 +177,15 @@ if generate_schedule:
             if preference.strip()
         ),
     )
-    schedule = Scheduler(owner).generate_schedule(schedule_date, constraints)
+    schedule = scheduler.generate_schedule(schedule_date, constraints)
     if schedule.tasks:
+        total_minutes = sum(task.duration_minutes for task in schedule.tasks)
+        st.success(
+            f"Schedule ready for {schedule.date:%B} {schedule.date.day}, "
+            f"{schedule.date.year}: "
+            f"{len(schedule.tasks)} task(s), {total_minutes} of "
+            f"{constraints.available_minutes} available minutes."
+        )
         pet_by_task_id = {
             task.task_id: pet.name
             for pet in owner.pets
@@ -162,11 +196,18 @@ if generate_schedule:
                 {
                     "pet": pet_by_task_id[task.task_id],
                     "task": task.title,
-                    "duration_minutes": task.duration_minutes,
-                    "priority": task.priority,
+                    "duration": f"{task.duration_minutes} min",
+                    "priority": task.priority.title(),
+                    "start time": (
+                        task.start_time.strftime("%H:%M")
+                        if task.start_time is not None
+                        else "Not set"
+                    ),
                 }
-                for task in schedule.tasks
+                for task in scheduler.sort_tasks_by_time(schedule.tasks)
             ]
         )
+        for warning in scheduler.detect_schedule_conflicts(schedule):
+            st.warning(warning)
     else:
         st.info("No tasks fit the available time.")

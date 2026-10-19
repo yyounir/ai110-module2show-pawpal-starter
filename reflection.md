@@ -88,10 +88,15 @@
 
 - What part of this project are you most satisfied with?
 
+> Part of the project that I was satisfied with was how I was able to understand the structure of the code and gain some knowledge with system design through AI's help.
+
 **b. What you would improve**
 
 - If you had another iteration, what would you improve or redesign?
 
+> If I had another iteration, I would try to look over the mermaid diagram to study it and understand how the system works out and improve it further as well as testing it out with AI.
+
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+> One important thing that I learned about designing systems and working with AI on this project is to simply be descriptive. While we are living in this Agentic Era, we have limitless possibilities to make development and coding much easier than ever, however it must all be on just one prompt where we would need to be as descriptive as possible so that we wouldnt have to waste any tokens.

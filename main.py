@@ -35,7 +35,7 @@ def main() -> None:
             f"{next_breakfast.due_date.isoformat()}"
         )
 
-    print("Tasks sorted by duration (HH:MM):")
+    print("Tasks sorted by start time (unscheduled tasks last):")
     for task in scheduler.sort_tasks_by_time():
         pet_name = next(
             pet.name for pet in owner.pets if task in pet.tasks

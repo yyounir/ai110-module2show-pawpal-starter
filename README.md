@@ -90,25 +90,41 @@ tests\test_pawpal.py .........                                                  
 
 
 
-## 📐 Smarter Scheduling
+## Features
 
+- **Constraint-based daily planning:** `Scheduler.generate_schedule()` considers tasks due on or before the selected date, skips completed tasks, and selects tasks that fit the available minutes. Its greedy selection favors higher priority, then matching owner preferences, then shorter tasks; it may leave some time unused.
+- **Start-time sorting:** `Scheduler.sort_tasks_by_time()` orders tasks with assigned start times chronologically and puts tasks without a start time last.
+- **Task filtering:** `Scheduler.filter_tasks()` filters by completion status, pet name, or both. The UI lets users show all, incomplete, or completed tasks for the selected pet.
+- **Recurring task completion:** `Scheduler.mark_task_complete()` marks a task complete and creates its next occurrence one day later for daily tasks or seven days later for weekly tasks. Other frequencies are marked complete but do not create a new occurrence.
+- **Conflict warnings:** `Scheduler.detect_schedule_conflicts()` reports tasks in a generated schedule that share the same assigned start time. A warning does not remove either task from the schedule.
+- **Pet and task management:** Users can update the owner name, add pets, and add tasks with a duration, frequency, and priority.
 
-| Feature | Method(s) | Notes |
-|---------|-----------|-------|
-| Task sorting | `Scheduler.sort_tasks_by_time()` | Sorts task durations using zero-padded `HH:MM` keys. |
-| Filtering | `Scheduler.filter_tasks()` | Filters by completion status, pet name, or both. |
-| Recurring tasks | `Scheduler.mark_task_complete()` | Completing daily or weekly tasks adds a fresh occurrence due one or seven days later. |
-| Conflict handling | `Scheduler.detect_schedule_conflicts()` | Returns warnings when scheduled tasks share a start time; scheduling continues. |
-| Recurring tasks | | e.g., daily vs. weekly |
+## Demo Walkthrough
 
-## 📸 Demo Walkthrough
+The Streamlit interface lets a user update the owner's name, add pets and their species and breed, and add care tasks for a selected pet. The task list can be filtered to show all, incomplete, or completed tasks. To generate a daily plan, the user chooses a date, enters available minutes and optional preferred task names, then reviews the resulting schedule and any conflict warnings.
 
-Describe your app in numbered steps so a reader can follow along without watching a video:
+For example, add Snowball (a dog) and Ice (a dog), then add a high-priority 30-minute morning walk for Snowball and a 15-minute feeding task for Ice. Generate today's schedule with 90 minutes available. The UI displays the selected tasks and remaining time summary. The standalone CLI provides a second example with two tasks assigned the same 08:00 start time; it demonstrates chronological sorting and displays the resulting conflict warning, along with filtering, task completion, daily recurrence, and schedule generation:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+```text
+Completed Breakfast; next occurrence: 2026-10-19
+Tasks sorted by start time (unscheduled tasks last):
+  Snowball: Morning walk (00:30)
+  Ice: Fresh water and feeding (00:15)
+  Snowball: Breakfast (00:10)
+  Snowball: Medication (00:05)
+  Snowball: Breakfast (00:10)
+  Ice: Brushing (00:20)
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+Completed tasks:
+  Breakfast
+
+Tasks for Ice:
+  Fresh water and feeding
+  Brushing
+Warning: Snowball's Morning walk and Ice's Fresh water and feeding are both scheduled at 08:00.
+Today's Schedule (2026-10-18) for Youn:
+  Snowball: Morning walk (30 min, daily, priority: high) at 08:00
+  Snowball: Medication (5 min, daily, priority: medium)
+  Ice: Fresh water and feeding (15 min, daily, priority: medium) at 08:00
+  Ice: Brushing (20 min, weekly, priority: low)
+```
